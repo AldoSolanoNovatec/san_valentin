@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Íconos PNG</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #FFF5F9 0%, #F0E8FF 100%);
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(255, 193, 220, 0.3);
+        }
+        h1 {
+            color: #F8C4D5;
+            text-align: center;
+        }
+        .instructions {
+            background: #FFF5F9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            line-height: 1.8;
+        }
+        .icon-preview {
+            text-align: center;
+            margin: 30px 0;
+        }
+        img {
+            max-width: 200px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        button {
+            background: linear-gradient(135deg, #FFD1DC 0%, #FFC4D9 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(255, 193, 220, 0.4);
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 193, 220, 0.5);
+        }
+        .buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+        code {
+            background: #F0E8FF;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌸 Generador de Íconos PNG</h1>
+        
+        <div class="instructions">
+            <h3>📱 Cómo generar los íconos:</h3>
+            <ol>
+                <li>Asegúrate de que el archivo <code>icon.svg</code> esté en la misma carpeta</li>
+                <li>Haz clic en los botones de abajo para generar cada tamaño</li>
+                <li>Se descargará automáticamente el archivo PNG</li>
+                <li>Sube los archivos <code>icon-192.png</code> y <code>icon-512.png</code> a tu repositorio de GitHub</li>
+            </ol>
+            
+            <h3>💡 Alternativa más fácil:</h3>
+            <p>También puedes usar sitios web como:</p>
+            <ul>
+                <li><a href="https://cloudconvert.com/svg-to-png" target="_blank">CloudConvert</a></li>
+                <li><a href="https://www.adobe.com/express/feature/image/convert/svg-to-png" target="_blank">Adobe Express</a></li>
+                <li><a href="https://svgtopng.com/" target="_blank">SVG to PNG</a></li>
+            </ul>
+            <p>Solo sube <code>icon.svg</code> y descarga en los tamaños 192x192 y 512x512 píxeles.</p>
+        </div>
+
+        <div class="icon-preview">
+            <h3>Vista previa del ícono:</h3>
+            <img id="preview" src="icon.svg" alt="Ícono">
+        </div>
+
+        <div class="buttons">
+            <button onclick="generatePNG(192)">Generar icon-192.png</button>
+            <button onclick="generatePNG(512)">Generar icon-512.png</button>
+        </div>
+
+        <div class="instructions" style="background: #E0F7E4;">
+            <h3>✅ Una vez que tengas los íconos:</h3>
+            <p>1. Ve a tu repositorio en GitHub</p>
+            <p>2. Clic en "Add file" → "Upload files"</p>
+            <p>3. Arrastra <code>icon-192.png</code> y <code>icon-512.png</code></p>
+            <p>4. Clic en "Commit changes"</p>
+            <p>5. ¡Listo! Tu PWA ya tendrá íconos perfectos 🌸</p>
+        </div>
+    </div>
+
+    <script>
+        async function generatePNG(size) {
+            try {
+                // Cargar el SVG
+                const response = await fetch('icon.svg');
+                const svgText = await response.text();
+                
+                // Crear un blob del SVG
+                const blob = new Blob([svgText], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                
+                // Crear una imagen
+                const img = new Image();
+                img.onload = function() {
+                    // Crear un canvas
+                    const canvas = document.createElement('canvas');
+                    canvas.width = size;
+                    canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Dibujar la imagen en el canvas
+                    ctx.drawImage(img, 0, 0, size, size);
+                    
+                    // Convertir a PNG y descargar
+                    canvas.toBlob(function(blob) {
+                        const downloadUrl = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = downloadUrl;
+                        a.download = `icon-${size}.png`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(downloadUrl);
+                        
+                        alert(`✅ icon-${size}.png generado exitosamente!`);
+                    }, 'image/png');
+                    
+                    URL.revokeObjectURL(url);
+                };
+                
+                img.onerror = function() {
+                    alert('❌ Error: No se pudo cargar icon.svg. Asegúrate de que esté en la misma carpeta.');
+                };
+                
+                img.src = url;
+                
+            } catch (error) {
+                alert('❌ Error: ' + error.message + '\n\nPor favor usa uno de los convertidores online mencionados arriba.');
+            }
+        }
+    </script>
+</body>
+</html>
